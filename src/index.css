@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg:       #0a0908;
+  --surface:  #111110;
+  --elevated: #1a1917;
+  --rim:      #252320;
+  --rim-hi:   #302e2b;
+  --text-1:   #e8e3d8;
+  --text-2:   #9a9288;
+  --text-3:   #655f58;
+  --amber:    #e5a00d;
+  --amber-dim:#2a2210;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-1);
+  font-family: 'Geist', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  font-size: 15px;
+}
+
+* { box-sizing: border-box; }
+
+/* override select/input autofill glow on dark */
+input:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 100px var(--surface) inset;
+  -webkit-text-fill-color: var(--text-1);
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+}
