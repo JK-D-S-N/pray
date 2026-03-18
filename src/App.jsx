@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { getUser } from './storage'
 import { scheduleReminder } from './reminder'
+import { useAuth } from './hooks/useAuth'
 import Layout from './components/Layout'
 import Onboarding from './pages/Onboarding'
+import AuthCallback from './pages/AuthCallback'
 import Home from './pages/Home'
 import NewPrayer from './pages/NewPrayer'
 import PrayerDetail from './pages/PrayerDetail'
@@ -14,10 +15,12 @@ import NewGroup from './pages/NewGroup'
 import JoinGroup from './pages/JoinGroup'
 import Settings from './pages/Settings'
 
-function RequireUser({ children }) {
-  const user = getUser()
-  if (!user) return <Navigate to="/onboard" replace />
-  return children
+function LoadingScreen() {
+  return (
+    <div className="min-h-dvh flex items-center justify-center bg-bg">
+      <p className="font-mono text-[11px] uppercase tracking-widest text-t3">Loading…</p>
+    </div>
+  )
 }
 
 export default function App() {
@@ -28,16 +31,24 @@ export default function App() {
     return () => window.removeEventListener('storage', handler)
   }, [])
 
+  const session = useAuth()
+
+  if (session === undefined) return <LoadingScreen />
+
   return (
     <BrowserRouter basename="/pray">
       <Routes>
-        <Route path="/onboard" element={<Onboarding />} />
+        <Route
+          path="/onboard"
+          element={session ? <Navigate to="/" replace /> : <Onboarding />}
+        />
 
-        <Route path="/" element={
-          <RequireUser>
-            <Layout />
-          </RequireUser>
-        }>
+        <Route path="/auth/callback" element={<AuthCallback />} />
+
+        <Route
+          path="/"
+          element={session ? <Layout /> : <Navigate to="/onboard" replace />}
+        >
           <Route index element={<Home />} />
           <Route path="new" element={<NewPrayer />} />
           <Route path="prayer/:id" element={<PrayerDetail />} />

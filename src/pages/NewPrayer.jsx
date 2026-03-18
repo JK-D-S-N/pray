@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
-import { addPrayer, getUserGroups } from '../storage'
+import { addPrayer, getUserGroups, getCategories } from '../storage'
 import { useStorage } from '../hooks/useStorage'
 
 const field = 'w-full border border-rim bg-surface text-t1 placeholder-t3 px-3 py-2.5 text-sm focus:outline-none focus:border-gold'
@@ -13,11 +13,16 @@ export default function NewPrayer() {
   const preGroupId = params.get('group')
 
   const [userGroups] = useStorage(getUserGroups)
+  const [categories] = useStorage(getCategories)
 
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
+  const [category, setCategory] = useState('other')
   const [shareWithGroup, setShareWithGroup] = useState(!!preGroupId)
   const [groupId, setGroupId] = useState(preGroupId || (userGroups[0]?.id ?? ''))
+  const [savedCount, setSavedCount] = useState(0)
+
+  const titleRef = useRef(null)
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -25,11 +30,22 @@ export default function NewPrayer() {
     addPrayer({
       title,
       body,
-      category: 'other',
+      category,
       visibility: shareWithGroup && groupId ? 'group' : 'private',
       groupId: shareWithGroup ? groupId : undefined,
     })
-    navigate('/')
+    setTitle('')
+    setBody('')
+    setSavedCount(c => c + 1)
+    titleRef.current?.focus()
+  }
+
+  // Enter in title submits; Enter in textarea adds newline (default)
+  function handleTitleKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmit(e)
+    }
   }
 
   return (
@@ -39,15 +55,22 @@ export default function NewPrayer() {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <h1 className="text-lg font-semibold text-t1 tracking-tight">New Prayer</h1>
+        {savedCount > 0 && (
+          <span className="ml-auto font-mono text-[10px] uppercase tracking-widest text-t3">
+            {savedCount} saved
+          </span>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className={label}>Title *</label>
           <input
+            ref={titleRef}
             type="text"
             value={title}
             onChange={e => setTitle(e.target.value)}
+            onKeyDown={handleTitleKeyDown}
             placeholder="What are you praying for?"
             autoFocus
             className={field}
@@ -63,6 +86,19 @@ export default function NewPrayer() {
             rows={4}
             className={`${field} resize-none`}
           />
+        </div>
+
+        <div>
+          <label className={label}>Category</label>
+          <select
+            value={category}
+            onChange={e => setCategory(e.target.value)}
+            className={field}
+          >
+            {categories.map(c => (
+              <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+            ))}
+          </select>
         </div>
 
         {userGroups.length > 0 && (
@@ -90,13 +126,24 @@ export default function NewPrayer() {
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={!title.trim()}
-          className="w-full bg-gold text-bg font-semibold py-2.5 text-sm tracking-tight disabled:opacity-30 hover:brightness-110 transition-all"
-        >
-          Add prayer
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="submit"
+            disabled={!title.trim()}
+            className="flex-1 bg-gold text-bg font-semibold py-2.5 text-sm tracking-tight disabled:opacity-30 hover:brightness-110 transition-all"
+          >
+            Add prayer
+          </button>
+          {savedCount > 0 && (
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="px-4 py-2.5 border border-rim text-sm text-t2 hover:border-rim-hi transition-colors"
+            >
+              Done
+            </button>
+          )}
+        </div>
       </form>
     </div>
   )

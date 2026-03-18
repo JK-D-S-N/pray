@@ -1,26 +1,40 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
-import { findGroupByCode, addMember, getUser, isInGroup } from '../storage'
+import { findGroupByCode, saveGroupLocally, addMember, getUser, isInGroup } from '../storage'
+import { findGroupByCodeRemote } from '../sync'
 
 export default function JoinGroup() {
   const navigate = useNavigate()
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    const group = findGroupByCode(code)
+    setLoading(true)
+
+    // Check local cache first, then Supabase
+    let group = findGroupByCode(code)
+    if (!group) {
+      group = await findGroupByCodeRemote(code)
+    }
+
+    setLoading(false)
+
     if (!group) {
       setError('No group found with that code.')
       return
     }
-    const user = getUser()
+
     if (isInGroup(group.id)) {
       navigate(`/groups/${group.id}`)
       return
     }
+
+    const user = getUser()
+    saveGroupLocally(group)
     addMember(group.id, user.id, 'member')
     navigate(`/groups/${group.id}`, { replace: true })
   }
@@ -53,10 +67,10 @@ export default function JoinGroup() {
 
         <button
           type="submit"
-          disabled={code.length < 6}
+          disabled={code.length < 6 || loading}
           className="w-full bg-gold text-bg font-semibold py-2.5 text-sm tracking-tight disabled:opacity-30 hover:brightness-110 transition-all"
         >
-          Join group
+          {loading ? 'Looking up…' : 'Join group'}
         </button>
       </form>
     </div>
