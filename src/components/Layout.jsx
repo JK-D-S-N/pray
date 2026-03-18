@@ -10,14 +10,7 @@ const NAV = [
 export default function Layout() {
   return (
     <div className="min-h-dvh flex flex-col max-w-lg mx-auto">
-      {/* title bar */}
-      <header className="fixed top-0 left-0 right-0 z-10 bg-bg border-b border-rim">
-        <div className="max-w-lg mx-auto flex items-center px-4 h-11">
-          <span className="font-mono text-[11px] uppercase tracking-widest text-t3">sounding</span>
-        </div>
-      </header>
-
-      <main className="flex-1 pt-11 pb-16">
+      <main className="flex-1 pb-16">
         <Outlet />
       </main>
 

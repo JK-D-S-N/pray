@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Trash2, Archive, CheckCircle2, Share2, Lock, Users, ArrowRight } from 'lucide-react'
 import { format } from 'date-fns'
-import { getPrayer, getPrayers, updatePrayer, deletePrayer, markAnswered, getGroup, logPrayed } from '../storage'
+import { getPrayer, getPrayers, updatePrayer, deletePrayer, markAnswered, getGroup, logPrayed, getPrayedCount } from '../storage'
 import { useStorage } from '../hooks/useStorage'
 import { shareText, answeredPrayerText } from '../share'
 
@@ -160,6 +160,9 @@ export default function PrayerDetail() {
 
             <p className="font-mono text-[11px] text-t3 mb-6">
               Added {format(new Date(prayer.createdAt), 'MMM d, yyyy')}
+              {getPrayedCount(id) > 0 && (
+                <span className="ml-3">· Prayed {getPrayedCount(id)} time{getPrayedCount(id) !== 1 ? 's' : ''}</span>
+              )}
             </p>
 
             {/* answered state */}

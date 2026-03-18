@@ -52,23 +52,28 @@ export default function Home() {
             const expanded = expandedGroups.has(groupId)
             const count = list.length
 
+            // Single group prayer — render as a plain card, no stack
+            if (count === 1) {
+              return <PrayerCard key={groupId} prayer={list[0]} />
+            }
+
             return (
               <div
                 key={groupId}
                 className="relative"
-                style={{ marginBottom: !expanded && count >= 3 ? 6 : !expanded && count >= 2 ? 3 : 0 }}
+                style={{ marginBottom: !expanded && count >= 3 ? 3 : !expanded && count >= 2 ? 1.5 : 0 }}
               >
                 {/* Back cards — absolutely positioned, offset down+right */}
                 {!expanded && count >= 3 && (
                   <div
                     className="absolute inset-0 border border-rim bg-surface"
-                    style={{ transform: 'translate(6px, 6px)', zIndex: 1 }}
+                    style={{ transform: 'translate(3px, 3px)', zIndex: 1 }}
                   />
                 )}
                 {!expanded && count >= 2 && (
                   <div
                     className="absolute inset-0 border border-rim bg-surface"
-                    style={{ transform: 'translate(3px, 3px)', zIndex: 2 }}
+                    style={{ transform: 'translate(1.5px, 1.5px)', zIndex: 2 }}
                   />
                 )}
 
