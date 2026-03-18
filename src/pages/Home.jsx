@@ -116,9 +116,11 @@ export default function Home() {
 
       <Link
         to="/new"
-        className="fixed bottom-20 left-1/2 -translate-x-1/2 px-8 py-2.5 border border-gold text-gold font-mono text-[11px] uppercase tracking-widest bg-bg/80 backdrop-blur-sm hover:bg-gold hover:text-bg transition-all whitespace-nowrap"
+        className="fixed bottom-16 left-0 right-0 max-w-lg mx-auto px-4"
       >
-        Add prayer
+        <span className="block w-full py-2.5 border border-gold text-gold font-mono text-[11px] uppercase tracking-widest text-center bg-bg/80 backdrop-blur-sm hover:bg-gold hover:text-bg transition-all">
+          Add prayer
+        </span>
       </Link>
     </div>
   )
